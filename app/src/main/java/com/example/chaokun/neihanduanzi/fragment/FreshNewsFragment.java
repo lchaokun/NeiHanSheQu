@@ -15,7 +15,6 @@ public class FreshNewsFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -25,10 +24,7 @@ public class FreshNewsFragment extends BaseFragment {
         return view;
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
 
-    }
 
 
 }

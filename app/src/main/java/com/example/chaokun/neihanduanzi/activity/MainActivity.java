@@ -55,7 +55,7 @@ public class MainActivity extends BaseActivity {
         mActionBarDrawerToggle.syncState();
         drawerLayout.setDrawerListener(mActionBarDrawerToggle);
 
-//        replaceFragment(R.id.frame_container, new FreshNewsFragment());
+        replaceFragment(R.id.frame_container, new FreshNewsFragment());
         replaceFragment(R.id.drawer_container, new MainMenuFragment());
     }
 

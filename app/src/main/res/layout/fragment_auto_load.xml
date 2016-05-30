@@ -3,10 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="我是新鲜事"/>
+        android:layout_height="match_parent">
 
+        <com.example.chaokun.neihanduanzi.view.AutoLoadRecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <include layout="@layout/common_loading"></include>
 
 </FrameLayout>
