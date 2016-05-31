@@ -16,18 +16,25 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.chaokun.neihanduanzi.R;
+import com.example.chaokun.neihanduanzi.bean.CommentNumber;
 import com.example.chaokun.neihanduanzi.bean.Picture;
+import com.example.chaokun.neihanduanzi.callback.LoadResultCallBack;
+import com.example.chaokun.neihanduanzi.fragment.PictureFragment;
 import com.example.chaokun.neihanduanzi.utils.GsonUtil;
 import com.example.chaokun.neihanduanzi.utils.ImageLoadProxy;
 import com.example.chaokun.neihanduanzi.utils.MyHttpUtils;
 import com.example.chaokun.neihanduanzi.utils.NetWorkUtil;
+import com.example.chaokun.neihanduanzi.utils.String2TimeUtil;
 import com.example.chaokun.neihanduanzi.utils.ToastUtils;
 import com.example.chaokun.neihanduanzi.view.ShowMaxImageView;
+import com.google.gson.JsonObject;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -42,12 +49,15 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
     private Activity mActivity;
     private Picture.PictureType mType;
     private boolean isWifiConnected;
+    private LoadResultCallBack mLoadCallBack;
 
-    public PictureAdapter(Activity activity, Picture.PictureType type) {
+    public PictureAdapter(Activity activity, Picture.PictureType type,LoadResultCallBack loadCallBack) {
         mActivity = activity;
         pictures = new ArrayList<>();
         this.mType=type;
         isWifiConnected = NetWorkUtil.isWifiConnected(mActivity);
+        ImageLoadProxy.initImageLoader(activity);
+        this.mLoadCallBack=loadCallBack;
     }
 
     private void setAnimation(View viewToAnimate, int position) {
@@ -87,13 +97,21 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
     }
 
     private void loadData() {
+
         MyHttpUtils.activitySendHttpClientGet(Picture.getRequestUrl(mType,page), new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
                 Picture picture = GsonUtil.jsonToBean(responseInfo.result,Picture.class);
+                if (page==1){
+                    pictures.clear();
+                }
                 pictures.addAll(picture.getComments());
-                notifyDataSetChanged();
+
                 //每次加载后缓存
+
+
+                //获取评论
+                getCommentNumber();
             }
 
             @Override
@@ -102,6 +120,53 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             }
         });
 
+    }
+
+    private void getCommentNumber(){
+       final StringBuilder sb = new StringBuilder();
+        for (Picture.CommentsBean joke : pictures) {
+            sb.append("comment-" + joke.getComment_ID() + ",");
+        }
+
+        MyHttpUtils.activitySendHttpClientGet(CommentNumber.getCommentCountsURL(sb.toString()), new RequestCallBack<String>() {
+            @Override
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                try {
+                    JSONObject object = new JSONObject(responseInfo.result);
+                    JSONObject res = object.getJSONObject("response");
+                    String[] comment_IDs = getRequestUrl().split("\\=")[1].split("\\,");
+                    ArrayList<CommentNumber> commentNumbers = new ArrayList<>();
+                    for (String comment_ID : comment_IDs) {
+
+                        if (!res.isNull(comment_ID)) {
+                            CommentNumber commentNumber = new CommentNumber();
+                            commentNumber.setComments(res.getJSONObject(comment_ID).getInt(CommentNumber.COMMENTS));
+                            commentNumber.setThread_id(res.getJSONObject(comment_ID).getString(CommentNumber.THREAD_ID));
+                            commentNumber.setThread_key(res.getJSONObject(comment_ID).getString(CommentNumber.THREAD_KEY));
+                            commentNumbers.add(commentNumber);
+                        } else {
+                            //可能会出现没有对应id的数据的情况，为了保证条数一致，添加默认数据
+                            commentNumbers.add(new CommentNumber("0", "0", 0));
+                        }
+                    }
+
+                    for (int i = 0; i <pictures.size() ; i++) {
+                        pictures.get(i).setComment_counts(commentNumbers.get(i).getComments());
+                    }
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                notifyDataSetChanged();
+                mLoadCallBack.onSuccess();
+            }
+
+            @Override
+            public void onFailure(HttpException error, String msg) {
+                ToastUtils.showErr(mActivity);
+                mLoadCallBack.onError();
+            }
+        });
     }
 
     @Override
@@ -146,6 +211,15 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             holder.tv_content.setVisibility(View.VISIBLE);
             holder.tv_content.setText(bean.getText_content().trim());
         }
+
+        holder.tv_author.setText(bean.getComment_author());
+        holder.tv_time.setText(String2TimeUtil.dateString2GoodExperienceFormat(bean.getComment_date()));
+        holder.tv_like.setText(bean.getVote_positive());
+        holder.tv_unlike.setText(bean.getVote_negative());
+        holder.tv_comment_count.setText(bean.getComment_counts()+"");
+
+
+        setAnimation(holder.card, position);
     }
 
     @Override

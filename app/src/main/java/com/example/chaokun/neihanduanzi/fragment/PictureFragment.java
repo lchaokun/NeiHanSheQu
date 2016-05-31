@@ -5,13 +5,18 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.chaokun.neihanduanzi.R;
 import com.example.chaokun.neihanduanzi.adapte.PictureAdapter;
 import com.example.chaokun.neihanduanzi.base.BaseFragment;
+import com.example.chaokun.neihanduanzi.bean.Picture;
 import com.example.chaokun.neihanduanzi.callback.LoadMoreListener;
+import com.example.chaokun.neihanduanzi.callback.LoadResultCallBack;
 import com.example.chaokun.neihanduanzi.utils.ImageLoadProxy;
 import com.example.chaokun.neihanduanzi.view.AutoLoadRecyclerView;
 import com.victor.loading.rotate.RotateLoading;
@@ -19,7 +24,7 @@ import com.victor.loading.rotate.RotateLoading;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-public class PictureFragment extends BaseFragment  {
+public class PictureFragment extends BaseFragment  implements LoadResultCallBack{
     @InjectView(R.id.recycler_view)
     AutoLoadRecyclerView mRecyclerView;
     @InjectView(R.id.swipeRefreshLayout)
@@ -28,11 +33,13 @@ public class PictureFragment extends BaseFragment  {
     RotateLoading loading;
     private MediaScannerConnection connection;
     private PictureAdapter mAdapter;
+    protected Picture.PictureType mType;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setHasOptionsMenu(true);
+        setHasOptionsMenu(true);
 
+        mType = Picture.PictureType.BoringPicture;
     }
 
 
@@ -55,7 +62,7 @@ public class PictureFragment extends BaseFragment  {
             @Override
             public void loadMore() {
                 //加载更多
-
+                mAdapter.loadNextPage();
             }
         });
         mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
@@ -65,10 +72,31 @@ public class PictureFragment extends BaseFragment  {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-//                mAdapter.loadFirst();
+                mAdapter.loadFirst();
             }
         });
+        mRecyclerView.setOnPauseListenerParams(false, true);
+        mAdapter = new PictureAdapter(getActivity(),mType,this);
+        mRecyclerView.setAdapter(mAdapter);
+//        mAdapter.setmSaveFileCallBack(this);
+        mAdapter.loadFirst();
+        loading.start();
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_refresh, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_refresh) {
+            mSwipeRefreshLayout.setRefreshing(true);
+            mAdapter.loadFirst();
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -78,4 +106,19 @@ public class PictureFragment extends BaseFragment  {
         ImageLoadProxy.getImageLoader().clearMemoryCache();
     }
 
+    @Override
+    public void onSuccess() {
+        loading.stop();
+        if (mSwipeRefreshLayout.isRefreshing()){
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
+    }
+
+    @Override
+    public void onError() {
+        loading.stop();
+        if (mSwipeRefreshLayout.isRefreshing()){
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
+    }
 }

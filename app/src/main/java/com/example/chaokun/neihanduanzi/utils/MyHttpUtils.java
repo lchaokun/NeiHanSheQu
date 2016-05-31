@@ -68,7 +68,7 @@ public class MyHttpUtils {
 
 		}
 		http.configTimeout(120000);// 设置超时时间
-		http.send(HttpMethod.POST, urlStr, requestCallBack);
+		http.send(HttpMethod.GET, urlStr, requestCallBack);
 
 	}
 

@@ -44,6 +44,16 @@ public class ToastUtils {
         if (isShow)
             Toast.makeText(context, message, Toast.LENGTH_LONG).show();
     }
+    /**
+     * 显示Toast错误
+     *
+     * @param context
+     */
+    public static void showErr(Context context)
+    {
+        if (isShow)
+            Toast.makeText(context, "网络错误", Toast.LENGTH_LONG).show();
+    }
 
     /**
      * 长时间显示Toast

@@ -1,11 +1,15 @@
 package com.example.chaokun.neihanduanzi.activity;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -13,6 +17,7 @@ import com.example.chaokun.neihanduanzi.R;
 import com.example.chaokun.neihanduanzi.base.BaseActivity;
 import com.example.chaokun.neihanduanzi.fragment.FreshNewsFragment;
 import com.example.chaokun.neihanduanzi.fragment.MainMenuFragment;
+import com.example.chaokun.neihanduanzi.utils.ToastUtils;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -59,6 +64,7 @@ public class MainActivity extends BaseActivity {
         replaceFragment(R.id.drawer_container, new MainMenuFragment());
     }
 
+
     @Override
     public void doBusiness(Context mContext) {
 
@@ -68,6 +74,13 @@ public class MainActivity extends BaseActivity {
     public void initdata() {
         super.initdata();
     }
+
+///////////////////////////////////////////////////////////////////////////
+    // Drawer Method
+    ///////////////////////////////////////////////////////////////////////////
+
+
+
     public void closeDrawer() {
         drawerLayout.closeDrawers();
     }
