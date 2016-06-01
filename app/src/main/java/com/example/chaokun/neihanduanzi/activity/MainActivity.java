@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,6 +16,7 @@ import android.widget.FrameLayout;
 
 import com.example.chaokun.neihanduanzi.R;
 import com.example.chaokun.neihanduanzi.base.BaseActivity;
+import com.example.chaokun.neihanduanzi.base.MyApplication;
 import com.example.chaokun.neihanduanzi.fragment.FreshNewsFragment;
 import com.example.chaokun.neihanduanzi.fragment.MainMenuFragment;
 import com.example.chaokun.neihanduanzi.utils.ToastUtils;
@@ -34,6 +36,8 @@ public class MainActivity extends BaseActivity {
     DrawerLayout drawerLayout;
 
     private ActionBarDrawerToggle mActionBarDrawerToggle;
+
+    private long exitTime;
     @Override
     public int bindLayout() {
         return R.layout.activity_main;
@@ -75,7 +79,24 @@ public class MainActivity extends BaseActivity {
         super.initdata();
     }
 
-///////////////////////////////////////////////////////////////////////////
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK
+                && event.getAction() == KeyEvent.ACTION_DOWN) {
+            if ((System.currentTimeMillis() - exitTime) > 2000) {
+               ToastUtils.showLong(context,"再按一次退出程序");
+                exitTime = System.currentTimeMillis();
+            } else {
+                finish();
+            }
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////
     // Drawer Method
     ///////////////////////////////////////////////////////////////////////////
 

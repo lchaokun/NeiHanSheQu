@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import com.example.chaokun.neihanduanzi.callback.LoadFinishCallBack;
 import com.example.chaokun.neihanduanzi.callback.LoadMoreListener;
 import com.example.chaokun.neihanduanzi.utils.ImageLoadProxy;
+import com.lidroid.xutils.exception.DbException;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 
@@ -80,7 +81,11 @@ public class AutoLoadRecyclerView extends RecyclerView implements LoadFinishCall
                 //有回调接口，并且不是加载状态，并且剩下2个item，并且向下滑动，则自动加载
                 if (loadMoreListener != null && !isLoadingMore && lastVisibleItem >= totalItemCount -
                         2 && dy > 0) {
-                    loadMoreListener.loadMore();
+                    try {
+                        loadMoreListener.loadMore();
+                    } catch (DbException e) {
+                        e.printStackTrace();
+                    }
                     isLoadingMore = true;
                 }
             }

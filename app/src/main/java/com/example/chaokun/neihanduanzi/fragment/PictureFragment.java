@@ -15,16 +15,22 @@ import com.example.chaokun.neihanduanzi.R;
 import com.example.chaokun.neihanduanzi.adapte.PictureAdapter;
 import com.example.chaokun.neihanduanzi.base.BaseFragment;
 import com.example.chaokun.neihanduanzi.bean.Picture;
+import com.example.chaokun.neihanduanzi.callback.LoadFinishCallBack;
 import com.example.chaokun.neihanduanzi.callback.LoadMoreListener;
 import com.example.chaokun.neihanduanzi.callback.LoadResultCallBack;
 import com.example.chaokun.neihanduanzi.utils.ImageLoadProxy;
+import com.example.chaokun.neihanduanzi.utils.JDMediaScannerConnectionClient;
+import com.example.chaokun.neihanduanzi.utils.ToastUtils;
 import com.example.chaokun.neihanduanzi.view.AutoLoadRecyclerView;
+import com.lidroid.xutils.exception.DbException;
 import com.victor.loading.rotate.RotateLoading;
+
+import java.io.File;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-public class PictureFragment extends BaseFragment  implements LoadResultCallBack{
+public class PictureFragment extends BaseFragment  implements LoadResultCallBack,LoadFinishCallBack {
     @InjectView(R.id.recycler_view)
     AutoLoadRecyclerView mRecyclerView;
     @InjectView(R.id.swipeRefreshLayout)
@@ -60,7 +66,7 @@ public class PictureFragment extends BaseFragment  implements LoadResultCallBack
         mRecyclerView.setLoadMoreListener(new LoadMoreListener(){
 
             @Override
-            public void loadMore() {
+            public void loadMore() throws DbException {
                 //加载更多
                 mAdapter.loadNextPage();
             }
@@ -72,14 +78,22 @@ public class PictureFragment extends BaseFragment  implements LoadResultCallBack
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mAdapter.loadFirst();
+                try {
+                    mAdapter.loadFirst();
+                } catch (DbException e) {
+                    e.printStackTrace();
+                }
             }
         });
         mRecyclerView.setOnPauseListenerParams(false, true);
-        mAdapter = new PictureAdapter(getActivity(),mType,this);
+        mAdapter = new PictureAdapter(getActivity(),mType,this,mRecyclerView);
         mRecyclerView.setAdapter(mAdapter);
-//        mAdapter.setmSaveFileCallBack(this);
-        mAdapter.loadFirst();
+        mAdapter.setmSaveFileCallBack(this);
+        try {
+            mAdapter.loadFirst();
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
         loading.start();
 
     }
@@ -93,7 +107,11 @@ public class PictureFragment extends BaseFragment  implements LoadResultCallBack
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
             mSwipeRefreshLayout.setRefreshing(true);
-            mAdapter.loadFirst();
+            try {
+                mAdapter.loadFirst();
+            } catch (DbException e) {
+                e.printStackTrace();
+            }
             return true;
         }
         return false;
@@ -120,5 +138,18 @@ public class PictureFragment extends BaseFragment  implements LoadResultCallBack
         if (mSwipeRefreshLayout.isRefreshing()){
             mSwipeRefreshLayout.setRefreshing(false);
         }
+    }
+
+    @Override
+    public void loadFinish(Object obj) {
+        Bundle bundle = (Bundle) obj;
+        boolean isSmallPic = bundle.getBoolean(DATA_IS_SIAMLL_PIC);
+        String filePath = bundle.getString(DATA_FILE_PATH);
+        File newFile = new File(filePath);
+        JDMediaScannerConnectionClient connectionClient = new JDMediaScannerConnectionClient(isSmallPic,
+                newFile);
+        connection = new MediaScannerConnection(getActivity(), connectionClient);
+        connectionClient.setMediaScannerConnection(connection);
+        connection.connect();
     }
 }

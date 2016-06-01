@@ -5,13 +5,18 @@ import java.util.Stack;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.graphics.Color;
+
+import com.example.chaokun.neihanduanzi.R;
 
 /**
  * 整个应用程序Applicaiton
  * @author linchaokun
  *
  */
-public class MyApplication extends Application {  
+public class MyApplication extends Application {
+    public static int COLOR_OF_DIALOG = R.color.pink;
+    public static int COLOR_OF_DIALOG_CONTENT = Color.WHITE;
       
     private static Stack<Activity> activityStack;  
     private static MyApplication singleton;
@@ -26,8 +31,12 @@ public class MyApplication extends Application {
     // 获得application实例 
     public static MyApplication getInstance() {  
         return singleton;  
-    }  
-  
+    }
+
+    // 获得application实例
+    public static Context getContext() {
+        return mContext;
+    }
     /** 
      * add Activity 添加Activity到栈 
      */  

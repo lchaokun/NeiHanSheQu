@@ -84,7 +84,7 @@ public class Picture implements Serializable{
         this.comments = comments;
     }
 
-    public static class CommentsBean {
+    public static class CommentsBean implements Serializable{
         private String comment_ID;
         private String comment_post_ID;
         private String comment_author;

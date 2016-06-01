@@ -15,11 +15,16 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.chaokun.neihanduanzi.R;
+import com.example.chaokun.neihanduanzi.base.MyApplication;
 import com.example.chaokun.neihanduanzi.bean.CommentNumber;
+import com.example.chaokun.neihanduanzi.bean.DataBase;
 import com.example.chaokun.neihanduanzi.bean.Picture;
+import com.example.chaokun.neihanduanzi.callback.LoadFinishCallBack;
 import com.example.chaokun.neihanduanzi.callback.LoadResultCallBack;
 import com.example.chaokun.neihanduanzi.fragment.PictureFragment;
+import com.example.chaokun.neihanduanzi.utils.DataBaseCrete;
 import com.example.chaokun.neihanduanzi.utils.GsonUtil;
 import com.example.chaokun.neihanduanzi.utils.ImageLoadProxy;
 import com.example.chaokun.neihanduanzi.utils.MyHttpUtils;
@@ -27,7 +32,7 @@ import com.example.chaokun.neihanduanzi.utils.NetWorkUtil;
 import com.example.chaokun.neihanduanzi.utils.String2TimeUtil;
 import com.example.chaokun.neihanduanzi.utils.ToastUtils;
 import com.example.chaokun.neihanduanzi.view.ShowMaxImageView;
-import com.google.gson.JsonObject;
+import com.lidroid.xutils.exception.DbException;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
@@ -37,6 +42,7 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -50,14 +56,19 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
     private Picture.PictureType mType;
     private boolean isWifiConnected;
     private LoadResultCallBack mLoadCallBack;
+    private LoadFinishCallBack mLoadFinisCallBack;
+    private LoadFinishCallBack mSaveFileCallBack;
+    private DataBaseCrete datacre;
+    private int menu=2;
 
-    public PictureAdapter(Activity activity, Picture.PictureType type,LoadResultCallBack loadCallBack) {
+    public PictureAdapter(Activity activity, Picture.PictureType type,LoadResultCallBack loadCallBack,LoadFinishCallBack LoadFinisCallBack) {
         mActivity = activity;
         pictures = new ArrayList<>();
         this.mType=type;
         isWifiConnected = NetWorkUtil.isWifiConnected(mActivity);
         ImageLoadProxy.initImageLoader(activity);
         this.mLoadCallBack=loadCallBack;
+        this.mLoadFinisCallBack = LoadFinisCallBack;
     }
 
     private void setAnimation(View viewToAnimate, int position) {
@@ -75,27 +86,58 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         holder.card.clearAnimation();
     }
 
-    public void loadFirst() {
+    public void loadFirst() throws DbException {
         page = 1;
         loadDataByNetworkType();
     }
 
-    public void loadNextPage() {
+    public void loadNextPage() throws DbException {
         page++;
         loadDataByNetworkType();
     }
 
-    private void loadDataByNetworkType() {
+    private void loadDataByNetworkType() throws DbException {
 
         if (NetWorkUtil.isNetWorkConnected(mActivity)) {
+            //先加载缓存数据在加载网络数据
+            loadCache();
             //有网络加载网络数据
             loadData();
         } else {
             //无网络加载缓存数据
-//            loadCache();
+            loadCache();
         }
     }
 
+    /**
+     * 加载缓存数据
+     */
+    private void loadCache() throws DbException {
+        if(datacre==null){
+            datacre = new DataBaseCrete(mActivity);
+        }
+         DataBase db = datacre.findPage(page,menu);
+        if(null!=db){
+            String request = db.getRequest();
+            String count = db.getCounts();
+            String[] counts = count.split(",");
+            loadRequestJson(request,counts);
+        }
+    }
+
+    private void loadRequestJson(String json,String[] counts){
+        Picture picture = GsonUtil.jsonToBean(json,Picture.class);
+        List<Picture.CommentsBean> comments = picture.getComments();
+        for (int i = 0; i <comments.size() ; i++) {
+            comments.get(i).setComment_counts(Integer.parseInt(counts[i]));
+        }
+
+        pictures.addAll(comments);
+        notifyDataSetChanged();
+
+        mLoadCallBack.onSuccess();
+
+    }
     private void loadData() {
 
         MyHttpUtils.activitySendHttpClientGet(Picture.getRequestUrl(mType,page), new RequestCallBack<String>() {
@@ -111,18 +153,20 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
 
                 //获取评论
-                getCommentNumber();
+                getCommentNumber(responseInfo.result);
             }
 
             @Override
             public void onFailure(HttpException error, String msg) {
                 ToastUtils.showLong(mActivity,"网络错误");
+                mLoadFinisCallBack.loadFinish(null);
             }
         });
 
     }
 
-    private void getCommentNumber(){
+
+    private void getCommentNumber(final String request){
        final StringBuilder sb = new StringBuilder();
         for (Picture.CommentsBean joke : pictures) {
             sb.append("comment-" + joke.getComment_ID() + ",");
@@ -132,6 +176,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
                 try {
+                    mLoadFinisCallBack.loadFinish(null);
                     JSONObject object = new JSONObject(responseInfo.result);
                     JSONObject res = object.getJSONObject("response");
                     String[] comment_IDs = getRequestUrl().split("\\=")[1].split("\\,");
@@ -150,9 +195,14 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                         }
                     }
 
+                    String counts = "";
                     for (int i = 0; i <pictures.size() ; i++) {
                         pictures.get(i).setComment_counts(commentNumbers.get(i).getComments());
+                        counts+=commentNumbers.get(i).getComments()+",";
                     }
+
+                    //缓存数据,保存数据库
+                    SaveDataBase(request,counts);
 
                 }catch (Exception e){
                     e.printStackTrace();
@@ -165,10 +215,29 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
             public void onFailure(HttpException error, String msg) {
                 ToastUtils.showErr(mActivity);
                 mLoadCallBack.onError();
+                mLoadFinisCallBack.loadFinish(null);
             }
         });
     }
 
+    /**
+     *  缓存数据,保存数据库
+     * @param request
+     * @param reque
+     * @throws DbException
+     */
+    private void SaveDataBase(String request,String reque) throws DbException {
+        datacre = new DataBaseCrete(mActivity);
+        datacre.delete(page);
+
+        DataBase data = new DataBase();
+        data.setId(page);
+        data.setRequest(request);
+        data.setPage(page);
+        data.setCounts(reque);
+        data.setMenuNumber(2);
+        datacre.sava(data);
+    }
     @Override
     public int getItemCount() {
         return pictures.size();
@@ -218,6 +287,36 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         holder.tv_unlike.setText(bean.getVote_negative());
         holder.tv_comment_count.setText(bean.getComment_counts()+"");
 
+        holder.img_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new MaterialDialog.Builder(mActivity)
+                        .title(R.string.app_name)
+                        .titleColor(MyApplication.COLOR_OF_DIALOG_CONTENT)
+                        .items(R.array.picture_dialog)
+                        .backgroundColor(mActivity.getResources().getColor(MyApplication.COLOR_OF_DIALOG))
+                        .contentColor(MyApplication.COLOR_OF_DIALOG_CONTENT)
+                        .itemsCallback(new MaterialDialog.ListCallback() {
+                            @Override
+                            public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+
+                                switch (which) {
+                                   /* //分享
+                                    case 0:
+                                        ShareUtil.sharePicture(mActivity, picture
+                                                .getPics()[0]);
+                                        break;
+                                    //保存
+                                    case 1:
+                                        FileUtil.savePicture(mActivity, picture
+                                                .getPics()[0],mSaveFileCallBack);
+                                        break;*/
+                                }
+                            }
+                        })
+                        .show();
+            }
+        });
 
         setAnimation(holder.card, position);
     }
@@ -226,6 +325,10 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
     public PictureViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_pic,parent,false);
         return new PictureViewHolder(view);
+    }
+
+    public void setmSaveFileCallBack(LoadFinishCallBack mSaveFileCallBack) {
+        this.mSaveFileCallBack = mSaveFileCallBack;
     }
 
     public static class PictureViewHolder extends RecyclerView.ViewHolder {

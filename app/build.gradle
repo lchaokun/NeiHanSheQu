@@ -30,4 +30,5 @@ dependencies {
     compile 'com.victor:lib:1.0.1'
     compile 'com.android.support:cardview-v7:23.2.0'
     compile files('libs/gson-2.2.4.jar')
+    compile 'com.afollestad.material-dialogs:core:0.8.5.9'
 }
