@@ -25,10 +25,12 @@ import com.example.chaokun.neihanduanzi.callback.LoadFinishCallBack;
 import com.example.chaokun.neihanduanzi.callback.LoadResultCallBack;
 import com.example.chaokun.neihanduanzi.fragment.PictureFragment;
 import com.example.chaokun.neihanduanzi.utils.DataBaseCrete;
+import com.example.chaokun.neihanduanzi.utils.FileUtil;
 import com.example.chaokun.neihanduanzi.utils.GsonUtil;
 import com.example.chaokun.neihanduanzi.utils.ImageLoadProxy;
 import com.example.chaokun.neihanduanzi.utils.MyHttpUtils;
 import com.example.chaokun.neihanduanzi.utils.NetWorkUtil;
+import com.example.chaokun.neihanduanzi.utils.ShareUtil;
 import com.example.chaokun.neihanduanzi.utils.String2TimeUtil;
 import com.example.chaokun.neihanduanzi.utils.ToastUtils;
 import com.example.chaokun.neihanduanzi.view.ShowMaxImageView;
@@ -100,7 +102,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
         if (NetWorkUtil.isNetWorkConnected(mActivity)) {
             //先加载缓存数据在加载网络数据
-            loadCache();
+//            loadCache();
             //有网络加载网络数据
             loadData();
         } else {
@@ -245,7 +247,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
 
     @Override
     public void onBindViewHolder(final PictureViewHolder holder, int position) {
-        Picture.CommentsBean bean = pictures.get(position);
+        final Picture.CommentsBean bean = pictures.get(position);
         String picUrl = bean.getPics().get(0);
         if (picUrl.endsWith(".gif")) {
             holder.img_gif.setVisibility(View.VISIBLE);
@@ -301,20 +303,18 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                             public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
 
                                 switch (which) {
-                                   /* //分享
+                                    //分享
                                     case 0:
-                                        ShareUtil.sharePicture(mActivity, picture
-                                                .getPics()[0]);
+                                        ShareUtil.sharePicture(mActivity, bean.getPics().get(0));
                                         break;
                                     //保存
                                     case 1:
-                                        FileUtil.savePicture(mActivity, picture
-                                                .getPics()[0],mSaveFileCallBack);
-                                        break;*/
+                                        FileUtil.savePicture(mActivity, bean
+                                                .getPics().get(0),mSaveFileCallBack);
+                                        break;
                                 }
                             }
-                        })
-                        .show();
+                        }) .show();
             }
         });
 
