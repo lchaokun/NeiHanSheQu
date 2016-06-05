@@ -1,6 +1,7 @@
 package com.example.chaokun.neihanduanzi.adapte;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +18,9 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.chaokun.neihanduanzi.R;
+import com.example.chaokun.neihanduanzi.activity.ImageDetailActivity;
+import com.example.chaokun.neihanduanzi.base.BaseActivity;
+import com.example.chaokun.neihanduanzi.base.ConstantString;
 import com.example.chaokun.neihanduanzi.base.MyApplication;
 import com.example.chaokun.neihanduanzi.bean.CommentNumber;
 import com.example.chaokun.neihanduanzi.bean.DataBase;
@@ -315,6 +319,24 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
                                 }
                             }
                         }) .show();
+            }
+        });
+
+        holder.img.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mActivity, ImageDetailActivity.class);
+
+                intent.putExtra(ConstantString.DATA_IMAGE_AUTHOR, bean.getComment_author());
+                intent.putExtra(ConstantString.DATA_IMAGE_URL, (String[])bean.getPics().toArray(new String[bean.getPics().size()]));
+                intent.putExtra(ConstantString.DATA_IMAGE_ID, bean.getComment_ID());
+                intent.putExtra(ConstantString.DATA_THREAD_KEY, "comment-" + bean.getComment_ID());
+
+                if (bean.getPics().get(0).endsWith(".gif")) {
+                    intent.putExtra(ConstantString.DATA_IS_NEED_WEBVIEW, true);
+                }
+
+                mActivity.startActivity(intent);
             }
         });
 
