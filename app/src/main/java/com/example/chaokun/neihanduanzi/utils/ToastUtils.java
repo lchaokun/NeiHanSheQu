@@ -3,6 +3,8 @@ package com.example.chaokun.neihanduanzi.utils;
 import android.content.Context;
 import android.widget.Toast;
 
+import com.example.chaokun.neihanduanzi.base.MyApplication;
+
 /**
  * Created by wcb1 on 2016/5/31.
  */
@@ -21,6 +23,11 @@ public class ToastUtils {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
+    public static void showStr(CharSequence message){
+        if(isShow){
+            Toast.makeText(MyApplication.getContext(), message, Toast.LENGTH_SHORT).show();
+        }
+    }
     /**
      * 短时间显示Toast
      *

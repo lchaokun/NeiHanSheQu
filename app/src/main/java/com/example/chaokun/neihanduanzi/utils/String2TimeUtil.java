@@ -47,6 +47,16 @@ public class String2TimeUtil {
 		}
 	}
 
+	/**
+	 * 时间戳转时间
+	 * @param
+	 * @return
+     */
+	public static String timeToStr(Long time){
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+		return sdf.format(new Date(time*1000L));
+	}
+
 	public static boolean isNullString(String s) {
 		return s == null || s.equals("") || s.equals("null");
 	}

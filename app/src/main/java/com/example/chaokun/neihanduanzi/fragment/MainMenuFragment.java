@@ -34,6 +34,8 @@ public class MainMenuFragment extends BaseFragment {
     private MainActivity mainActivity;
     private MenuAdapter mAdapter;
 
+    private MenuItem.FragmentType currentFragment = MenuItem.FragmentType.FreshNews;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -87,8 +89,12 @@ public class MainMenuFragment extends BaseFragment {
                 @Override
                 public void onClick(View v) {
                     try {
-                        Fragment fragment = (Fragment)Class.forName(item.getFragment().getName()).newInstance();
-                        mainActivity.replaceFragment(R.id.frame_container,fragment);
+                        if(currentFragment!=item.getType()){
+                            Fragment fragment = (Fragment)Class.forName(item.getFragment().getName()).newInstance();
+                            mainActivity.replaceFragment(R.id.frame_container,fragment);
+                            currentFragment = item.getType();
+                        }
+
                     }catch (Exception e){
                         e.printStackTrace();
                     }

@@ -1,7 +1,6 @@
 package com.example.chaokun.neihanduanzi.adapte;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,18 +14,31 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.chaokun.neihanduanzi.R;
+import com.example.chaokun.neihanduanzi.base.MyApplication;
+import com.example.chaokun.neihanduanzi.bean.Joke;
 import com.example.chaokun.neihanduanzi.callback.LoadFinishCallBack;
 import com.example.chaokun.neihanduanzi.callback.LoadResultCallBack;
+import com.example.chaokun.neihanduanzi.utils.GsonUtil;
+import com.example.chaokun.neihanduanzi.utils.MyHttpUtils;
 import com.example.chaokun.neihanduanzi.utils.NetWorkUtil;
+import com.example.chaokun.neihanduanzi.utils.ShareUtil;
 import com.example.chaokun.neihanduanzi.utils.String2TimeUtil;
+import com.example.chaokun.neihanduanzi.utils.TextUtil;
+import com.example.chaokun.neihanduanzi.utils.ToastUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class JokeAdapter extends RecyclerView.Adapter<JokeAdapter.JokeViewHolder> {
 
     private int page;
     private int lastPosition = -1;
-//    private ArrayList<Joke> mJokes;
+    private List<Joke.DataBean> list;
     private Activity mActivity;
     private LoadResultCallBack mLoadResultCallBack;
     private LoadFinishCallBack mLoadFinisCallBack;
@@ -35,7 +47,7 @@ public class JokeAdapter extends RecyclerView.Adapter<JokeAdapter.JokeViewHolder
         mActivity = activity;
         mLoadFinisCallBack = loadFinisCallBack;
         mLoadResultCallBack = loadResultCallBack;
-//        mJokes = new ArrayList<>();
+        list = new ArrayList<>();
     }
 
     protected void setAnimation(View viewToAnimate, int position) {
@@ -64,21 +76,26 @@ public class JokeAdapter extends RecyclerView.Adapter<JokeAdapter.JokeViewHolder
     @Override
     public void onBindViewHolder(final JokeViewHolder holder, final int position) {
 
-      /*  final Joke joke = mJokes.get(position);
-        holder.tv_content.setText(joke.getComment_content());
-        holder.tv_author.setText(joke.getComment_author());
-        holder.tv_time.setText(String2TimeUtil.dateString2GoodExperienceFormat(joke.getComment_date()));
-        holder.tv_like.setText(joke.getVote_positive());
-        holder.tv_comment_count.setText(joke.getComment_counts());
-        holder.tv_unlike.setText(joke.getVote_negative());
+        final Joke.DataBean bean = list.get(position);
+        if(bean.getGroup()!=null){
+            holder.tv_content.setText(bean.getGroup().getContent());
+            holder.tv_author.setText(bean.getGroup().getUser().getName());
+            holder.tv_time.setText(String2TimeUtil.timeToStr(bean.getGroup().getCreate_time()));
+            holder.tv_like.setText(bean.getGroup().getDigg_count());
+            holder.tv_comment_count.setText(bean.getGroup().getComment_count());
+            holder.tv_unlike.setText(bean.getGroup().getBury_count());
+        }
+
 
         holder.img_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new MaterialDialog.Builder(mActivity)
+                        .title(R.string.app_name)
+                        .titleColor(MyApplication.COLOR_OF_DIALOG_CONTENT)
                         .items(R.array.joke_dialog)
-                        .backgroundColor(mActivity.getResources().getColor(JDApplication.COLOR_OF_DIALOG))
-                        .contentColor(JDApplication.COLOR_OF_DIALOG_CONTENT)
+                        .backgroundColor(mActivity.getResources().getColor(MyApplication.COLOR_OF_DIALOG))
+                        .contentColor(MyApplication.COLOR_OF_DIALOG_CONTENT)
                         .itemsCallback(new MaterialDialog.ListCallback() {
                             @Override
                             public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
@@ -86,11 +103,11 @@ public class JokeAdapter extends RecyclerView.Adapter<JokeAdapter.JokeViewHolder
                                 switch (which) {
                                     //分享
                                     case 0:
-                                        ShareUtil.shareText(mActivity, joke.getComment_content().trim());
+                                        ShareUtil.shareText(mActivity, bean.getGroup().getContent().trim());
                                         break;
                                     //复制
                                     case 1:
-                                        TextUtil.copy(mActivity, joke.getComment_content());
+                                        TextUtil.copy(mActivity, bean.getGroup().getContent());
                                         break;
                                 }
 
@@ -99,14 +116,7 @@ public class JokeAdapter extends RecyclerView.Adapter<JokeAdapter.JokeViewHolder
             }
         });
 
-        holder.ll_comment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(mActivity, CommentListActivity.class);
-                intent.putExtra("thread_key", "comment-" + joke.getComment_ID());
-                mActivity.startActivity(intent);
-            }
-        });*/
+
 
         setAnimation(holder.card, position);
 
@@ -114,8 +124,7 @@ public class JokeAdapter extends RecyclerView.Adapter<JokeAdapter.JokeViewHolder
 
     @Override
     public int getItemCount() {
-//        return mJokes.size();
-        return 1;
+        return list.size();
     }
 
     public void loadFirst() {
@@ -139,19 +148,37 @@ public class JokeAdapter extends RecyclerView.Adapter<JokeAdapter.JokeViewHolder
     }
 
     private void loadData() {
-      /*  RequestManager.addRequest(new Request4Joke(Joke.getRequestUrl(page),
-                new Response.Listener<ArrayList<Joke>>
-                        () {
-                    @Override
-                    public void onResponse(ArrayList<Joke> response) {
-                        getCommentCounts(response);
-                    }
-                }, new Response.ErrorListener() {
+        MyHttpUtils.activitySendHttpClientGet(Joke.url, new RequestCallBack<String>() {
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                try {
+                    JSONObject object = new JSONObject(responseInfo.result);
+                    JSONObject data = object.getJSONObject("data");
+
+                    Joke joke = GsonUtil.jsonToBean(data.toString(), Joke.class);
+                    if(page==1){
+                        list.clear();
+                    }
+
+                    list.addAll(joke.getData());
+                    notifyDataSetChanged();
+                    mLoadResultCallBack.onSuccess();
+                    mLoadFinisCallBack.loadFinish(null);
+                } catch (Exception e) {
+                    e.printStackTrace();
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(HttpException error, String msg) {
+                ToastUtils.showErr(mActivity);
+                mLoadResultCallBack.onError();
                 mLoadFinisCallBack.loadFinish(null);
             }
-        }), mActivity);*/
+        });
+
     }
 
     private void loadCache() {
