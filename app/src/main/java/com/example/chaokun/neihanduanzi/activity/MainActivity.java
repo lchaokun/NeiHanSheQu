@@ -11,7 +11,7 @@ import android.widget.FrameLayout;
 
 import com.example.chaokun.neihanduanzi.R;
 import com.example.chaokun.neihanduanzi.base.BaseActivity;
-import com.example.chaokun.neihanduanzi.fragment.FreshNewsFragment;
+import com.example.chaokun.neihanduanzi.fragment.MusicFragment;
 import com.example.chaokun.neihanduanzi.fragment.MainMenuFragment;
 import com.example.chaokun.neihanduanzi.utils.ToastUtils;
 
@@ -57,7 +57,7 @@ public class MainActivity extends BaseActivity {
         mActionBarDrawerToggle.syncState();
         drawerLayout.setDrawerListener(mActionBarDrawerToggle);
 
-        replaceFragment(R.id.frame_container, new FreshNewsFragment());
+        replaceFragment(R.id.frame_container, new MusicFragment());
         replaceFragment(R.id.drawer_container, new MainMenuFragment());
     }
 

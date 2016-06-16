@@ -31,5 +31,7 @@ dependencies {
     compile 'com.android.support:cardview-v7:23.2.0'
     compile files('libs/gson-2.2.4.jar')
     compile 'com.afollestad.material-dialogs:core:0.8.5.9'
+    compile 'fm.jiecao:jiecaovideoplayer:2.0'
     compile files('libs/uk-co-senab-photoview-source.jar')
+    compile 'im.fir:fir-sdk:latest.integration@aar'
 }

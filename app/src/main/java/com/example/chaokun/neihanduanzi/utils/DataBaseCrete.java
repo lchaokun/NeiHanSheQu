@@ -56,8 +56,8 @@ public class DataBaseCrete {
     /**
      * 删除
      */
-    public void delete(int page) throws DbException {
-        DataBase dataBase = db.findFirst(Selector.from(DataBase.class).where("page","=",page));
+    public void delete(int page,int menu) throws DbException {
+        DataBase dataBase = db.findFirst(Selector.from(DataBase.class).where("page","=",page).and("MenuNumber","=",menu));
         if(dataBase!=null){
             db.delete(dataBase);
         }

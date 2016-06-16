@@ -16,6 +16,7 @@ public class BaseFragment extends Fragment implements ConstantString {
 
     }
 
+
     @Override
     public void onDestroy() {
         super.onDestroy();

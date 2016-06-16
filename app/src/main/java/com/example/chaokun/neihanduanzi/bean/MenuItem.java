@@ -5,7 +5,7 @@ import android.support.v4.app.Fragment;
 public class MenuItem {
 
     public enum FragmentType {
-        FreshNews, BoringPicture, Sister, Joke, Video
+        music, BoringPicture, Sister, Joke, Video
     }
 
     private String title;

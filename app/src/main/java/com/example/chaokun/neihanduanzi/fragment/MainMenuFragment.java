@@ -34,7 +34,7 @@ public class MainMenuFragment extends BaseFragment {
     private MainActivity mainActivity;
     private MenuAdapter mAdapter;
 
-    private MenuItem.FragmentType currentFragment = MenuItem.FragmentType.FreshNews;
+    private MenuItem.FragmentType currentFragment = MenuItem.FragmentType.music;
 
     @Override
     public void onAttach(Context context) {
@@ -120,13 +120,13 @@ public class MainMenuFragment extends BaseFragment {
 
     private void addAllMenuItems(MenuAdapter mAdapter) {
         mAdapter.menuItems.clear();
-        mAdapter.menuItems.add(new MenuItem("新鲜事", R.mipmap.ic_explore_white_24dp, MenuItem.FragmentType.FreshNews,
-                FreshNewsFragment.class));
+        mAdapter.menuItems.add(new MenuItem("好声音", R.mipmap.ic_explore_white_24dp, MenuItem.FragmentType.music,
+                MusicFragment.class));
         mAdapter.menuItems.add(new MenuItem("无聊图", R.mipmap.ic_mood_white_24dp, MenuItem.FragmentType.BoringPicture,
                 PictureFragment.class));
-        mAdapter.menuItems.add(new MenuItem("妹子图", R.mipmap.ic_local_florist_white_24dp, MenuItem.FragmentType.Sister,
+        mAdapter.menuItems.add(new MenuItem("美女图", R.mipmap.ic_local_florist_white_24dp, MenuItem.FragmentType.Sister,
                 SisterFragment.class));
-        mAdapter.menuItems.add(new MenuItem("段子", R.mipmap.ic_chat_white_24dp, MenuItem.FragmentType.Joke, JokeFragment
+        mAdapter.menuItems.add(new MenuItem("小段子", R.mipmap.ic_chat_white_24dp, MenuItem.FragmentType.Joke, JokeFragment
                 .class));
         mAdapter.menuItems.add(new MenuItem("小电影", R.mipmap.ic_movie_white_24dp, MenuItem.FragmentType.Video,
                 VideoFragment.class));

@@ -20,6 +20,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.chaokun.neihanduanzi.R;
 import com.example.chaokun.neihanduanzi.activity.ImageDetailActivity;
 import com.example.chaokun.neihanduanzi.base.BaseActivity;
+import com.example.chaokun.neihanduanzi.base.BaseFragment;
 import com.example.chaokun.neihanduanzi.base.ConstantString;
 import com.example.chaokun.neihanduanzi.base.MyApplication;
 import com.example.chaokun.neihanduanzi.bean.CommentNumber;
@@ -65,9 +66,9 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
     private LoadFinishCallBack mLoadFinisCallBack;
     private LoadFinishCallBack mSaveFileCallBack;
     private DataBaseCrete datacre;
-    private int menu=2;
+    private int menu;
 
-    public PictureAdapter(Activity activity, Picture.PictureType type,LoadResultCallBack loadCallBack,LoadFinishCallBack LoadFinisCallBack) {
+    public PictureAdapter(Activity activity, Picture.PictureType type,LoadResultCallBack loadCallBack,LoadFinishCallBack LoadFinisCallBack,int menu) {
         mActivity = activity;
         pictures = new ArrayList<>();
         this.mType=type;
@@ -75,6 +76,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
         ImageLoadProxy.initImageLoader(activity);
         this.mLoadCallBack=loadCallBack;
         this.mLoadFinisCallBack = LoadFinisCallBack;
+        this.menu = menu;
     }
 
     private void setAnimation(View viewToAnimate, int position) {
@@ -234,14 +236,14 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureV
      */
     private void SaveDataBase(String request,String reque) throws DbException {
         datacre = new DataBaseCrete(mActivity);
-        datacre.delete(page);
+        datacre.delete(page,menu);
 
         DataBase data = new DataBase();
         data.setId(page);
         data.setRequest(request);
         data.setPage(page);
         data.setCounts(reque);
-        data.setMenuNumber(2);
+        data.setMenuNumber(menu);
         datacre.sava(data);
     }
     @Override

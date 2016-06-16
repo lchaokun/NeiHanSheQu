@@ -1,7 +1,5 @@
 package com.example.chaokun.neihanduanzi.fragment;
 
-
-import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,51 +9,50 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.example.chaokun.neihanduanzi.R;
 import com.example.chaokun.neihanduanzi.adapte.JokeAdapter;
+import com.example.chaokun.neihanduanzi.adapte.MusicAdapter;
+import com.example.chaokun.neihanduanzi.adapte.VideoAdapter;
 import com.example.chaokun.neihanduanzi.base.BaseFragment;
-import com.example.chaokun.neihanduanzi.callback.LoadFinishCallBack;
 import com.example.chaokun.neihanduanzi.callback.LoadMoreListener;
 import com.example.chaokun.neihanduanzi.callback.LoadResultCallBack;
-import com.example.chaokun.neihanduanzi.utils.JDMediaScannerConnectionClient;
 import com.example.chaokun.neihanduanzi.utils.ToastUtils;
 import com.example.chaokun.neihanduanzi.view.AutoLoadRecyclerView;
 import com.lidroid.xutils.exception.DbException;
 import com.victor.loading.rotate.RotateLoading;
 
-import java.io.File;
-
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import fm.jiecao.jcvideoplayer_lib.JCVideoPlayer;
 
-/**
- * 段子
- */
-public class JokeFragment extends BaseFragment implements LoadResultCallBack  {
+public class MusicFragment extends BaseFragment implements LoadResultCallBack {
+
+
     @InjectView(R.id.recycler_view)
     AutoLoadRecyclerView mRecyclerView;
     @InjectView(R.id.swipeRefreshLayout)
     SwipeRefreshLayout mSwipeRefreshLayout;
     @InjectView(R.id.loading)
     RotateLoading loading;
-
-
-    private JokeAdapter mAdapter;
-
-    public JokeFragment() {
-    }
+    private MusicAdapter mAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
+        JCVideoPlayer.setThumbImageViewScalType(ImageView.ScaleType.FIT_XY);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public void onPause() {
+        super.onPause();
+        JCVideoPlayer.releaseAllVideos();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_auto_load, container, false);
         ButterKnife.inject(this, view);
 
@@ -87,11 +84,12 @@ public class JokeFragment extends BaseFragment implements LoadResultCallBack  {
                 } catch (DbException e) {
                     e.printStackTrace();
                 }
+
             }
         });
 
         try {
-            mAdapter = new JokeAdapter(getActivity(), mRecyclerView, this);
+            mAdapter = new MusicAdapter(getActivity(), mRecyclerView, this);
         } catch (DbException e) {
             e.printStackTrace();
         }
@@ -101,6 +99,7 @@ public class JokeFragment extends BaseFragment implements LoadResultCallBack  {
         } catch (DbException e) {
             e.printStackTrace();
         }
+
         loading.start();
     }
 
@@ -119,10 +118,17 @@ public class JokeFragment extends BaseFragment implements LoadResultCallBack  {
             } catch (DbException e) {
                 e.printStackTrace();
             }
+
             return true;
         }
 
         return false;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.reset(this);
     }
 
     @Override
@@ -136,10 +142,9 @@ public class JokeFragment extends BaseFragment implements LoadResultCallBack  {
     @Override
     public void onError() {
         loading.stop();
-       ToastUtils.showLong(context,LOAD_FAILED);
+        ToastUtils.showLong(context,LOAD_FAILED);
         if (mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(false);
         }
     }
-
 }

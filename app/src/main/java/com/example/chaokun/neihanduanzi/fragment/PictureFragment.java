@@ -18,6 +18,7 @@ import com.example.chaokun.neihanduanzi.bean.Picture;
 import com.example.chaokun.neihanduanzi.callback.LoadFinishCallBack;
 import com.example.chaokun.neihanduanzi.callback.LoadMoreListener;
 import com.example.chaokun.neihanduanzi.callback.LoadResultCallBack;
+import com.example.chaokun.neihanduanzi.constant.Constants;
 import com.example.chaokun.neihanduanzi.utils.ImageLoadProxy;
 import com.example.chaokun.neihanduanzi.utils.JDMediaScannerConnectionClient;
 import com.example.chaokun.neihanduanzi.utils.ToastUtils;
@@ -40,6 +41,8 @@ public class PictureFragment extends BaseFragment  implements LoadResultCallBack
     private MediaScannerConnection connection;
     private PictureAdapter mAdapter;
     protected Picture.PictureType mType;
+
+    private int menu;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +89,13 @@ public class PictureFragment extends BaseFragment  implements LoadResultCallBack
             }
         });
         mRecyclerView.setOnPauseListenerParams(false, true);
-        mAdapter = new PictureAdapter(getActivity(),mType,this,mRecyclerView);
+        if(mType.equals(Picture.PictureType.BoringPicture)){
+            menu=Constants.menu2;
+        }else{
+            menu=Constants.menu3;
+        }
+
+        mAdapter = new PictureAdapter(getActivity(),mType,this,mRecyclerView, menu);
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.setmSaveFileCallBack(this);
         try {

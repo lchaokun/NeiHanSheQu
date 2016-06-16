@@ -9,13 +9,15 @@ import android.graphics.Color;
 
 import com.example.chaokun.neihanduanzi.R;
 
+import im.fir.sdk.FIR;
+
 /**
  * 整个应用程序Applicaiton
  * @author linchaokun
  *
  */
 public class MyApplication extends Application {
-    public static int COLOR_OF_DIALOG = R.color.pink;
+    public static int COLOR_OF_DIALOG = R.color.primary;
     public static int COLOR_OF_DIALOG_CONTENT = Color.WHITE;
       
     private static Stack<Activity> activityStack;  
@@ -27,6 +29,8 @@ public class MyApplication extends Application {
         super.onCreate();  
         singleton=this;
         mContext=this;
+        //bughd初始化
+        FIR.init(this);
     }  
     // 获得application实例 
     public static MyApplication getInstance() {  
