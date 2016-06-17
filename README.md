@@ -6,11 +6,11 @@
 
 先上效果图
 
-![GIF](https://coding.net/u/chaokun/p/NeiHanSheQu/git/blob/chaokun/images/neihanshequ.gif)
+![GIF](https://github.com/lchaokun/NeiHanSheQu/blob/chaokun/images/neihanshequ.gif)
 
 ##项目介绍
 
-内涵社区，一款集内涵段子，百思不得其姐，煎蛋与一身的搞笑社区。
+内涵社区，一款集内涵段子，百思不得其姐，煎蛋于一身的搞笑社区。
 
 项目虽小，五脏俱全，学习这个项目，你将学到
 
