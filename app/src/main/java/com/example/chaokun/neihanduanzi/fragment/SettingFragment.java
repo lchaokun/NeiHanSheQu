@@ -81,7 +81,7 @@ public class SettingFragment extends PreferenceFragment implements Preference.On
                         @Override
                         public void onNegative(MaterialDialog dialog) {
                             super.onNegative(dialog);
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://coding.net/u/chaokun/p/NeiHanDuanZi/git")));
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://coding.net/u/chaokun/p/NeiHanSheQu/git")));
                         }
 
                         @Override
