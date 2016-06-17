@@ -54,6 +54,7 @@
 ##使用到的开源框架
 
 - [Volley](https://android.googlesource.com/platform/frameworks/volley)
+- [Xutils](https://github.com/wyouflf/xUtils)
 - [Universal Image Load](https://github.com/nostra13/Android-Universal-Image-Loader)
 - [butter knife](https://github.com/JakeWharton/butterknife)
 - [EventBus](https://github.com/greenrobot/EventBus)
@@ -64,6 +65,6 @@
 - [LeakCanary](https://github.com/square/leakcanary)
 =======
 #内涵社区
-- 开发  者：林朝昆
+- 开发者：林朝昆
 - 开发时间：2016年6月
 
