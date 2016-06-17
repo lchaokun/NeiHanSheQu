@@ -61,8 +61,9 @@
 - [material-dialogs](https://github.com/afollestad/material-dialogs)
 - [gson](https://code.google.com/p/google-gson/)
 - [GreenDao](http://greendao-orm.com/)
-- [Loading](https://github.com/yankai-victor/Loading)
 - [LeakCanary](https://github.com/square/leakcanary)
+- [Loading](https://github.com/yankai-victor/Loading)
+
 =======
 #内涵社区
 - 开发者：林朝昆
