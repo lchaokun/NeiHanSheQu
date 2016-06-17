@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">内涵社区</string>
+    <string name="title_activity_setting">设置</string>
 </resources>

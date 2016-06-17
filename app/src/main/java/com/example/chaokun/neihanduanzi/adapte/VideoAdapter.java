@@ -101,8 +101,8 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
             holder.tvCommentCount.setText(bean.getGroup().getComment_count());
             holder.tvUnlike.setText(bean.getGroup().getBury_count());
         }else {
-            holder.videoplayer.setUp(Video.lckmp4url, "林朝昆个人视频\nQQ：812086325");
-            ImageLoadProxy.displayHeadIcon(Video.lckimg,holder.videoplayer.ivThumb);
+            holder.videoplayer.setUp(Video.lckmp4url, "我只是想为女神买个避孕药！！为什么会遇到电视台直播？");
+            ImageLoadProxy.displayHeadIcon(Video.coverImg,holder.videoplayer.ivThumb);
         }
         holder.imgShare.setOnClickListener(new View.OnClickListener() {
             @Override

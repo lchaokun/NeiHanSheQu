@@ -9,9 +9,9 @@ import java.util.List;
 public class Video implements Serializable{
     public static String url="http://ic.snssdk.com/neihan/stream/mix/v1/?mpic=1&essence=1&content_type=-104&message_cursor=-1&bd_longitude=113.369569&bd_latitude=23.149678&bd_city=%E5%B9%BF%E5%B7%9E%E5%B8%82&am_longitude=113.367863&am_latitude=23.149878&am_city=%E5%B9%BF%E5%B7%9E%E5%B8%82&am_loc_time=1465227022051&count=30&min_time=1465213698&screen_width=720&iid=4512422578&device_id=17215021497&ac=wifi&channel=NHSQH5AN&aid=7&app_name=joke_essay&version_code=431&device_platform=android&ssmix=a&device_type=6s+Plus&os_api=19&os_version=4.4.2&uuid=864394108025091&openudid=80FA5B208E050000&manifest_version_code=431";
     public static String coverurl="http://p2.pstatp.com/large/";
-    public static String lckmp4url="http://183.2.219.210/sohu/s26h23eab6/xdispatch/sohu.vod.qingcdn.com/TmwC0KIsWOyHbMPUht9DgtPDP49g8JvsMhvO0J1BPOXUyYk.mp4?key=vSAPA12UAUEK02Sq0Fn6ZgEoWt6Yuf7h&r=4ZJCXpbuTUJFjfwyjWIA5mE2oOXGgGcGNLXWqTW2ZVb2qF2OvmEAoO2tWOx&n=1&a=1801&cip=58.63.133.23&uid=14625926254881661626&pt=1&ch=my&vid=84170732_1&prod=flash";
+    public static String lckmp4url="http://i.snssdk.com/neihan/video/playback/?video_id=39bb5f9aaf88427d97fccbb824fc5a9d&amp;quality=480p&amp;line=0&amp;is_gif=0.mp4";
     public static String lckimg="http://a3.qpic.cn/psb?/V133b2Xt1twpwH/gS6yNBAsPLS1e5Tk0bz2ahImgz9GjWnZq4I.Kh1qHls!/b/dKQAAAAAAAAA&bo=1AT0AtQE9AIDACU!&rf=viewer_4";
-
+    public static String coverImg=coverurl+"71a00139b5e614a294a";
     private List<DataBean> data;
 
     public List<DataBean> getData() {

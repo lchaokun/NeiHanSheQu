@@ -2,6 +2,7 @@ package com.example.chaokun.neihanduanzi.fragment;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 import com.example.chaokun.neihanduanzi.R;
 import com.example.chaokun.neihanduanzi.activity.MainActivity;
+import com.example.chaokun.neihanduanzi.activity.SettingActivity;
 import com.example.chaokun.neihanduanzi.base.BaseFragment;
 import com.example.chaokun.neihanduanzi.bean.MenuItem;
 
@@ -50,6 +52,14 @@ public class MainMenuFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_drawer, container, false);
         ButterKnife.inject(this, view);
+
+        rlContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), SettingActivity.class));
+                mainActivity.closeDrawer();
+            }
+        });
         return view;
     }
 
