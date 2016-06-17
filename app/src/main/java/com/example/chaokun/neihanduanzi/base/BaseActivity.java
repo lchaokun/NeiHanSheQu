@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import com.example.chaokun.neihanduanzi.R;
 import com.lidroid.xutils.ViewUtils;
 
 import butterknife.ButterKnife;
@@ -43,7 +44,11 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseAct
 		doBusiness(this);
 
 	}
-
+	@Override
+	public void finish() {
+		super.finish();
+		overridePendingTransition(R.anim.anim_none, R.anim.trans_center_2_right);
+	}
 	public void initdata() {
 
 	}
