@@ -64,6 +64,6 @@
 - [LeakCanary](https://github.com/square/leakcanary)
 =======
 #内涵社区
--开发  者：林朝昆
--开发时间：2016年6月
+- 开发  者：林朝昆
+- 开发时间：2016年6月
 
