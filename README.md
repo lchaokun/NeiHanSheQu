@@ -68,4 +68,4 @@
 #内涵社区
 - 开发者：林朝昆
 - 开发时间：2016年6月
-- Android学习交流①群 152643026
+- [Android学习交流①群 152643026](http://shang.qq.com/wpa/qunwpa?idkey=246fc84ce77d73d184da47a458fdabf0b1cf732af62421838de5eb25b742d992)
